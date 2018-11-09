@@ -16,11 +16,6 @@ public class mainActivityImp implements mainActivityPresenter.presenter,mainActi
     }
 
     @Override
-    public void onDestroy() {
-
-    }
-
-    @Override
     public void requestDataFromServer() {
         mainView.showProgress();
         getNoticeIntractor.getNoticeArrayList(this);

@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +16,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.codecamp.prashant.moviebx.Adapter.MovieAdapter;
@@ -32,6 +37,7 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
     private RecyclerView recyclerView;
     public MovieAdapter adapter;
     public static List<movie> movieList;
+    public ImageView noInternet;
     public static Context mContext;
     ProgressDialog progressDialog;
     private mainActivityPresenter.presenter presenter;
@@ -44,18 +50,27 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
         setContentView(R.layout.activity_main);
         mContext=this;
         initializeRecyclerView();
+        noInternet=findViewById(R.id.noInternet);
         swipeRefreshLayout=findViewById(R.id.swipelayout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-        presenter = new mainActivityImp(this, new movieDataInteractor());
-        presenter.requestDataFromServer();
+        if(!isInternetOn()) {
+            showAlert("Please check your internet connectivity.");
+            noInternet.setVisibility(View.VISIBLE);
+            return;
+        }else{
+            presenter = new mainActivityImp(this, new movieDataInteractor());
+            presenter.requestDataFromServer();
+        }
+
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
 
                 if(swipeRefreshLayout.isRefreshing()){
                     swipeRefreshLayout.setRefreshing(false);
-                    presenter.requestDataFromServer();
-                }
+                        presenter.requestDataFromServer();
+                    }
             }
         });
 
@@ -185,5 +200,42 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
     @Override
     public void onResponseFailure(Throwable throwable) {
 
+    }
+
+    public static void showAlert(String message){
+        AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
+        alertDialog.setTitle("Alert");
+        alertDialog.setMessage(message);
+        alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
+
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    public  boolean isInternetOn() {
+
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+
+        // Check for network connections
+        if ( connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED ) {
+
+            // if connected with internet
+            return true;
+
+        } else if (
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED  ) {
+            return false;
+        }
+        return false;
     }
 }

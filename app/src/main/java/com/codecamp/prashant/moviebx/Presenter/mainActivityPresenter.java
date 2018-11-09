@@ -6,13 +6,7 @@ import java.util.List;
 
 public interface mainActivityPresenter {
 
-
-    /**
-     * Call when user interact with the view and other when view OnDestroy()
-     * */
     interface presenter{
-
-        void onDestroy();
 
         void requestDataFromServer();
 

@@ -7,6 +7,14 @@
     android:background="#D3D3D3"
     tools:showIn="@layout/activity_main">
 
+    <ImageView
+        android:id="@+id/noInternet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/noconnection"
+        android:scaleType="fitCenter"
+        android:visibility="gone"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"

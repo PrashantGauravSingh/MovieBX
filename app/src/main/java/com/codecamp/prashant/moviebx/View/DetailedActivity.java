@@ -1,6 +1,7 @@
 package com.codecamp.prashant.moviebx.View;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,12 +25,13 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static com.codecamp.prashant.moviebx.View.MainActivity.showAlert;
+
 public class DetailedActivity extends AppCompatActivity implements DetailedActivityPrsenenter.SecondView {
 
-    TextView nameOfMovie,plots,userRatings,releaseDate,vote_average,Language,BudgetLabelValue,RevenueLabelValue,Duration;
+    TextView nameOfMovie,plots,userRatings,releaseDate,Language,BudgetLabelValue,RevenueLabelValue,Duration;
     ImageView imageView;
     String ID;
-    String[] movieDetails;
     String body;
     JSONObject newObject;
 
@@ -55,10 +57,15 @@ public class DetailedActivity extends AppCompatActivity implements DetailedActiv
         if(intent.hasExtra("id")){
 
              ID=getIntent().getExtras().getString("id");
+            if(!isInternetOn()) {
+                showAlert("Please check your internet connectivity.");
+                return;
+            }
             getMovieData();
 
         }
     }
+
 
     @Override
     public void getMovieData() {
@@ -173,4 +180,29 @@ public class DetailedActivity extends AppCompatActivity implements DetailedActiv
 //        });
 //
 //    }
+
+    public  boolean isInternetOn() {
+
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+
+        // Check for network connections
+        if ( connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED ) {
+
+            // if connected with internet
+            return true;
+
+        } else if (
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED  ) {
+            return false;
+        }
+        return false;
+    }
+
+
 }
