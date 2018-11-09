@@ -1,4 +1,4 @@
-package com.codecamp.prashant.moviebx.Api;
+package com.codecamp.prashant.moviebx.Services;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

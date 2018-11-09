@@ -1,16 +1,20 @@
-package com.codecamp.prashant.moviebx;
+package com.codecamp.prashant.moviebx.View;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.codecamp.prashant.moviebx.Api.Client;
-import com.codecamp.prashant.moviebx.Api.Service;
+import com.codecamp.prashant.moviebx.BuildConfig;
+import com.codecamp.prashant.moviebx.Presenter.DetailedActivityPrsenenter;
+import com.codecamp.prashant.moviebx.R;
+import com.codecamp.prashant.moviebx.Services.Client;
+import com.codecamp.prashant.moviebx.Services.Service;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +24,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class DetailedActivity extends AppCompatActivity {
+public class DetailedActivity extends AppCompatActivity implements DetailedActivityPrsenenter.SecondView {
 
     TextView nameOfMovie,plots,userRatings,releaseDate,vote_average,Language,BudgetLabelValue,RevenueLabelValue,Duration;
     ImageView imageView;
@@ -51,12 +55,59 @@ public class DetailedActivity extends AppCompatActivity {
         if(intent.hasExtra("id")){
 
              ID=getIntent().getExtras().getString("id");
-            loadJSON();
+            getMovieData();
 
         }
     }
 
-    private void loadDataOnView(JSONObject moviedetails) {
+    @Override
+    public void getMovieData() {
+
+        try{
+            if(BuildConfig.THE_MOVIE_DB_API_TOKEN.isEmpty()){
+                Toast.makeText(getApplicationContext(),"Please obtain the Api Key",Toast.LENGTH_LONG);
+                return;
+            }
+            Client client=new Client();
+            Service service=client.getClient().create(Service.class);
+
+            Log.e("Movie ID: ",""+Integer.parseInt(ID));
+
+            Call<ResponseBody> call=service.getMoviesWithID(Integer.parseInt(ID),BuildConfig.THE_MOVIE_DB_API_TOKEN);
+            call.enqueue(new retrofit2.Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                        body = response.body().string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        newObject = new JSONObject(body);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    loadDataOnView(newObject);
+
+
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    Log.e("Error"," "+t.getMessage());
+                }
+
+
+            });
+
+        }catch (Exception e){
+            e.getLocalizedMessage();
+        }
+    }
+
+    @Override
+    public void loadDataOnView(JSONObject moviedetails) {
 
         String thumbnail=getIntent().getExtras().getString("poster_path");
             Glide.with(this).load(thumbnail).into(imageView);
@@ -86,50 +137,15 @@ public class DetailedActivity extends AppCompatActivity {
 
     }
 
-    private void loadJSON(){
-
-        try{
-            if(BuildConfig.THE_MOVIE_DB_API_TOKEN.isEmpty()){
-                Toast.makeText(getApplicationContext(),"Please obtain the Api Key",Toast.LENGTH_LONG);
-                return;
-            }
-            Client client=new Client();
-            Service service=client.getClient().create(Service.class);
-
-            Log.e("Movie ID: ",""+Integer.parseInt(ID));
-
-            Call<ResponseBody> call=service.getMoviesWithID(Integer.parseInt(ID),BuildConfig.THE_MOVIE_DB_API_TOKEN);
-            call.enqueue(new retrofit2.Callback<ResponseBody>() {
-                @Override
-                public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
-                    try {
-                         body = response.body().string();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                         newObject = new JSONObject(body);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    loadDataOnView(newObject);
-
-
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                    Log.e("Error"," "+t.getMessage());
-                }
-
-
-            });
-
-        }catch (Exception e){
-            e.getLocalizedMessage();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId()== android.R.id.home) {
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
+
 
 //    private void initCollapsToolBar() {
 //        final CollapsingToolbarLayout collapsingToolbarLayout=findViewById(R.id.collapseToolbar);

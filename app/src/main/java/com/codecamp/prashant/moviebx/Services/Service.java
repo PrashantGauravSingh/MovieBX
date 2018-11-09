@@ -1,4 +1,4 @@
-package com.codecamp.prashant.moviebx.Api;
+package com.codecamp.prashant.moviebx.Services;
 
 import com.codecamp.prashant.moviebx.model.MovieResponse;
 

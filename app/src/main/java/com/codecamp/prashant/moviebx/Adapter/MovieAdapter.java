@@ -1,17 +1,15 @@
 package com.codecamp.prashant.moviebx.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.codecamp.prashant.moviebx.DetailedActivity;
+import com.codecamp.prashant.moviebx.Presenter.RecyclerItemClickListener;
 import com.codecamp.prashant.moviebx.R;
 import com.codecamp.prashant.moviebx.model.movie;
 
@@ -22,10 +20,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
 
     public static Context mContext;
     private List<movie> movieList;
+    private RecyclerItemClickListener recyclerItemClickListener;
 
-    public MovieAdapter(Context mContext, List<movie> movieList) {
+    public MovieAdapter(Context mContext, List<movie> movieList,RecyclerItemClickListener recyclerItemClickListener) {
         this.mContext = mContext;
         this.movieList = movieList;
+        this.recyclerItemClickListener=recyclerItemClickListener;
     }
 
     @Override
@@ -84,17 +84,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
                 @Override
                 public void onClick(View view) {
                     int pos=getAdapterPosition();
-                    if(pos!=RecyclerView.NO_POSITION){
-                        movie selectedItem=movieList.get(pos);
-                        Intent intent=new Intent(mContext, DetailedActivity.class);
-                        intent.putExtra("id",movieList.get(pos).getId());
-                        intent.putExtra("poster_path",movieList.get(pos).getPosterPath());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
-                        Toast.makeText(view.getContext(),selectedItem.getOriginalTitle(),Toast.LENGTH_LONG).show();
-
-
-                    }
+                    recyclerItemClickListener.onItemClick(movieList.get(pos));
                 }
             });
         }
