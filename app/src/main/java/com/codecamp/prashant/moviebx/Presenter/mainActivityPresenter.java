@@ -8,7 +8,7 @@ public interface mainActivityPresenter {
 
     interface presenter{
 
-        void requestDataFromServer();
+        void requestDataFromServer(int value);
 
     }
     /**
@@ -36,6 +36,6 @@ public interface mainActivityPresenter {
             void onFailure(Throwable t);
         }
 
-        void getNoticeArrayList(OnFinishedListener onFinishedListener);
+        void getNoticeArrayList(int value,OnFinishedListener onFinishedListener);
     }
 }

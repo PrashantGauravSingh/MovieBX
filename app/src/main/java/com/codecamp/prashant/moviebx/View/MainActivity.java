@@ -40,6 +40,8 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
     public ImageView noInternet;
     public static Context mContext;
     ProgressDialog progressDialog;
+    int val=0;
+
     private mainActivityPresenter.presenter presenter;
     private SwipeRefreshLayout swipeRefreshLayout;
     public static final String TAG=MovieAdapter.class.getName();
@@ -49,17 +51,24 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext=this;
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            val= bundle.getInt("selectedValue");
+        }
         initializeRecyclerView();
         noInternet=findViewById(R.id.noInternet);
         swipeRefreshLayout=findViewById(R.id.swipelayout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
+
         if(!isInternetOn()) {
             showAlert("Please check your internet connectivity.");
             noInternet.setVisibility(View.VISIBLE);
             return;
         }else{
             presenter = new mainActivityImp(this, new movieDataInteractor());
-            presenter.requestDataFromServer();
+            presenter.requestDataFromServer(val);
         }
 
 
@@ -69,7 +78,7 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
 
                 if(swipeRefreshLayout.isRefreshing()){
                     swipeRefreshLayout.setRefreshing(false);
-                        presenter.requestDataFromServer();
+                        presenter.requestDataFromServer(val);
                     }
             }
         });
@@ -94,7 +103,14 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
         recyclerView=findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(layoutManager);
-        getSupportActionBar().setTitle("Popular Movies");
+        if(val==0) {
+            getSupportActionBar().setTitle("Popular Movies");
+        }else if(val==1) {
+            getSupportActionBar().setTitle("Upcoming Movies");
+        }else if(val==3){
+            getSupportActionBar().setTitle("Tv shows");
+        }
+
         movieList=new ArrayList<>();
 
     }
@@ -143,6 +159,8 @@ public class  MainActivity extends AppCompatActivity implements mainActivityPres
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
             case R.id.menu_settings:
+                Intent intent=new Intent(mContext,HelperActivity.class);
+                startActivity(intent);
                 return true;
                 default:
                     return super.onOptionsItemSelected(item);

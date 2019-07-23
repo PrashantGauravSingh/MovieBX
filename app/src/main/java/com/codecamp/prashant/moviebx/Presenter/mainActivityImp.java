@@ -16,9 +16,9 @@ public class mainActivityImp implements mainActivityPresenter.presenter,mainActi
     }
 
     @Override
-    public void requestDataFromServer() {
+    public void requestDataFromServer(int value) {
         mainView.showProgress();
-        getNoticeIntractor.getNoticeArrayList(this);
+        getNoticeIntractor.getNoticeArrayList(value,this);
 
     }
 

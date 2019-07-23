@@ -16,4 +16,10 @@ public interface Service {
     @GET("movie/{id}")
     Call<ResponseBody> getMoviesWithID(@Path("id") int id,@Query("api_key")String apiKey);
 
+    @GET("movie/upcoming")
+    Call<MovieResponse> getUpcomingMovies(@Query("api_key")String apiKey);
+
+    @GET("discover/tv")
+    Call<MovieResponse> getTvShow(@Query("api_key")String apiKey);
+
 }

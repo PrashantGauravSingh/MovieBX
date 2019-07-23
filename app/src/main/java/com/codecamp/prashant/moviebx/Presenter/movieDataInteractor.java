@@ -12,14 +12,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class movieDataInteractor implements mainActivityPresenter.GetNoticeIntractor {
+    Call<MovieResponse>call;
     @Override
-    public void getNoticeArrayList( final OnFinishedListener onFinishedListener) {
+    public void getNoticeArrayList(int value, final OnFinishedListener onFinishedListener) {
 
         /** Create handle for the RetrofitInstance interface*/
         Service service = Client.getClient().create(Service.class);
 
         /** Call the method with parameter in the interface to get the notice data*/
-        Call<MovieResponse>call=service.getPopularMovies(BuildConfig.THE_MOVIE_DB_API_TOKEN);
+        if(value==0) {
+            call=service.getPopularMovies(BuildConfig.THE_MOVIE_DB_API_TOKEN);
+        } else if(value==1) {
+             call = service.getUpcomingMovies(BuildConfig.THE_MOVIE_DB_API_TOKEN);
+        }else if(value==3){
+            call = service.getTvShow(BuildConfig.THE_MOVIE_DB_API_TOKEN);
+
+        }
         call.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
